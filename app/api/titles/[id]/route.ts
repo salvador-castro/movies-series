@@ -31,6 +31,43 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
         return NextResponse.json({ error: "Body inválido" }, { status: 400 });
     }
 
+    const db = await getDb();
+    const col = db.collection("titles");
+
+    // 1) PATCH mínimo: solo cambiar state (lo que necesita el botón "Pasar a ...")
+    //    Permitimos body = { state: "viendo" } o { state: "para_ver" }
+    const keys = Object.keys(body);
+    const onlyState = keys.length === 1 && keys[0] === "state";
+
+    if (onlyState) {
+        const state = body.state;
+
+        if (state !== "para_ver" && state !== "viendo" && state !== "vista") {
+            return NextResponse.json({ error: "state inválido" }, { status: 400 });
+        }
+
+        // Si alguien intenta pasar a vista vía PATCH mínimo, lo rechazamos
+        // porque tu UX exige notePost mediante modal.
+        if (state === "vista") {
+            return NextResponse.json(
+                { error: "notePost es obligatorio cuando state es vista" },
+                { status: 400 }
+            );
+        }
+
+        const res = await col.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: { state, updatedAt: new Date() } }
+        );
+
+        if (res.matchedCount === 0) {
+            return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+        }
+
+        return NextResponse.json({ ok: true });
+    }
+
+    // 2) PATCH “edición”: tu lógica original (requiere campos obligatorios)
     const {
         title,
         kind,
@@ -80,8 +117,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
         updatedAt: new Date(),
     };
 
-    const db = await getDb();
-    const res = await db.collection("titles").updateOne(
+    const res = await col.updateOne(
         { _id: new ObjectId(id) },
         { $set: update }
     );
@@ -92,6 +128,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
 
     return NextResponse.json({ ok: true });
 }
+
 
 export async function DELETE(_req: NextRequest, { params }: Ctx) {
     const { id } = await params;
