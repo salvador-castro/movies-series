@@ -609,8 +609,18 @@
 }
 
 @media (max-width: 640px) {
-    .item .btnRow button {
-        padding: 5px 12px;
-        font-size: 12px;
+    .itemTop {
+        flex-direction: column;
+    }
+
+    .btnRow {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .btnRow button {
+        width: 100%;
     }
 }
