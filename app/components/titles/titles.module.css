@@ -631,19 +631,17 @@
     .btnRow button:last-child {
         grid-column: span 2;
     }
+
+    .btnExportPdf {
+        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 .btnExportPdf {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-}
-
-@media (max-width: 640px) {
-    .btnExportPdf {
-        justify-content: center;
-        /* 👈 centra icono + texto */
-        text-align: center;
-        width: 100%;
-    }
 }
