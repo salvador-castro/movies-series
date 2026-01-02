@@ -52,11 +52,16 @@ export default function TitlesApp() {
     const qs = useMemo(() => {
         const sp = new URLSearchParams();
         if (q.trim()) sp.set("q", q.trim());
-        if (tab !== "all") sp.set("state", tab);
         if (kind) sp.set("kind", kind);
         const s = sp.toString();
         return s ? `?${s}` : "";
-    }, [q, tab, kind]);
+    }, [q, kind]);
+
+    const filteredItems = useMemo(() => {
+        if (tab === "all") return items;
+        return items.filter((it) => it.state === tab);
+    }, [items, tab]);
+
 
     const counts = useMemo(() => countByState(items), [items]);
 
@@ -230,7 +235,7 @@ export default function TitlesApp() {
                 <div className={styles.card}>
                     <div className={styles.cardTitle}>Listado</div>
                     <TitleList
-                        items={items}
+                        items={filteredItems}
                         onEdit={openEdit}
                         onDelete={remove}
                         onRequestStateChange={requestStateChange}
