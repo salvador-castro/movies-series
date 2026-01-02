@@ -632,3 +632,18 @@
         grid-column: span 2;
     }
 }
+
+.btnExportPdf {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 640px) {
+    .btnExportPdf {
+        justify-content: center;
+        /* 👈 centra icono + texto */
+        text-align: center;
+        width: 100%;
+    }
+}
