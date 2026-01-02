@@ -1,0 +1,97 @@
+/* Pagination (moderna) */
+.paginationWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.paginationBar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 10px;
+  border-radius: 14px;
+
+  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.pageBtn {
+  appearance: none;
+  -webkit-appearance: none;
+
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+
+  border-radius: 10px;
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  background: white;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: rgba(241, 245, 249, 0.95);
+  transform: translateY(-1px);
+  border-color: rgba(148, 163, 184, 0.9);
+}
+
+.pageBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.pageBtnActive {
+  border-color: rgba(59, 130, 246, 0.85);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.pageEllipsis {
+  padding: 0 6px;
+  opacity: 0.6;
+  font-weight: 700;
+  user-select: none;
+}
+
+.pageMeta {
+  margin-left: 6px;
+  padding: 0 10px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+
+  border-left: 1px solid rgba(226, 232, 240, 0.9);
+
+  font-size: 13px;
+  opacity: 0.7;
+  user-select: none;
+}
+
+@media (max-width: 520px) {
+  .paginationBar {
+    gap: 6px;
+    padding: 8px;
+    border-radius: 12px;
+  }
+
+  .pageBtn {
+    min-width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    padding: 0 9px;
+  }
+
+  .pageMeta {
+    display: none; /* en móvil suele ensuciar */
+  }
+}

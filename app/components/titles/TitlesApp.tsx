@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./titles.module.css";
 import TitleList from "./TitleList";
 import TitleModal from "./TitleModal";
+import Pagination from "./Pagination";
 
 export type TitleState = "para_ver" | "viendo" | "vista";
 export type TitleKind = "movie" | "series";
@@ -14,14 +15,12 @@ export type TitleDoc = {
     title: string;
     state: TitleState;
 
-    // IMDb / FilmAffinity ahora son "puntajes" 0..10 guardados como string normalizada
     imdbId: string | null;
     filmaffinityId: string | null;
 
     rating: number; // 1..10
     genres: string[];
 
-    // nuevos
     platform?: string;
     notePre?: string;
     notePost?: string;
@@ -36,6 +35,8 @@ function countByState(items: TitleDoc[]) {
     return c;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function TitlesApp() {
     const [tab, setTab] = useState<TitleState | "all">("all");
     const [q, setQ] = useState("");
@@ -48,6 +49,9 @@ export default function TitlesApp() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "edit">("create");
     const [editing, setEditing] = useState<TitleDoc | null>(null);
+
+    // ✅ paginación
+    const [page, setPage] = useState(1);
 
     const qs = useMemo(() => {
         const sp = new URLSearchParams();
@@ -62,6 +66,22 @@ export default function TitlesApp() {
         return items.filter((it) => it.state === tab);
     }, [items, tab]);
 
+    // ✅ total páginas según filtros/tabs
+    const totalPages = useMemo(() => {
+        return Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
+    }, [filteredItems.length]);
+
+    // ✅ clamp si quedaste en una página que ya no existe
+    useEffect(() => {
+        if (page > totalPages) setPage(totalPages);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [totalPages]);
+
+    // ✅ items paginados (lo que va a TitleList)
+    const pagedItems = useMemo(() => {
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        return filteredItems.slice(start, start + ITEMS_PER_PAGE);
+    }, [filteredItems, page]);
 
     const counts = useMemo(() => countByState(items), [items]);
 
@@ -77,6 +97,7 @@ export default function TitlesApp() {
             const data = await res.json().catch(() => null);
             if (!res.ok) throw new Error(data?.error || `Error ${res.status}`);
             setItems(Array.isArray(data?.items) ? data.items : []);
+            setPage(1); // ✅ al refrescar, volvemos a la primera página
         } catch (e: any) {
             flash("err", e?.message ?? "Error");
         } finally {
@@ -85,10 +106,19 @@ export default function TitlesApp() {
     }
 
     useEffect(() => {
+        // ✅ cuando cambian filtros de backend (q/kind), pedimos data
+        // y también reseteamos a página 1 para evitar UX rara
+        setPage(1);
+
         const t = setTimeout(refresh, 250);
         return () => clearTimeout(t);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [qs]);
+
+    // ✅ cuando cambian tabs (frontend), volvemos a la primera página
+    useEffect(() => {
+        setPage(1);
+    }, [tab]);
 
     function openCreate() {
         setModalMode("create");
@@ -149,10 +179,8 @@ export default function TitlesApp() {
         }
     }
 
-    // Cambio de estado: si pasa a "vista", abrimos modal para exigir "Descripción post vista"
     function requestStateChange(item: TitleDoc, next: TitleState) {
         if (next === "vista") {
-            // abrimos editar forzando state=vista; el modal ya obliga notePost
             openEdit({ ...item, state: "vista" });
         } else {
             saveEdit(item._id, { state: next });
@@ -177,18 +205,14 @@ export default function TitlesApp() {
 
             const url = buildPdfUrl();
 
-            // Preflight para detectar errores del backend antes de abrir ventana
             const res = await fetch(url, { method: "GET", cache: "no-store" });
             if (!res.ok) {
                 const data = await res.json().catch(() => null);
                 throw new Error(data?.error || `Error ${res.status}`);
             }
 
-            // Abrir el PDF en nueva pestaña
             const w = window.open(url, "_blank", "noopener,noreferrer");
-            if (!w) {
-                throw new Error("El navegador bloqueó el popup. Permití popups para este sitio.");
-            }
+            if (!w) throw new Error("El navegador bloqueó el popup. Permití popups para este sitio.");
 
             flash("ok", "PDF generado");
         } catch (e: any) {
@@ -197,7 +221,6 @@ export default function TitlesApp() {
             setExportingPdf(false);
         }
     }
-
 
     return (
         <div className={styles.page}>
@@ -212,11 +235,7 @@ export default function TitlesApp() {
                             + Agregar
                         </button>
 
-                        <button
-                            className={[styles.btnGhost, styles.btnSm].join(" ")}
-                            onClick={refresh}
-                            disabled={loading}
-                        >
+                        <button className={[styles.btnGhost, styles.btnSm].join(" ")} onClick={refresh} disabled={loading}>
                             {loading ? "Cargando..." : "Refrescar"}
                         </button>
 
@@ -227,18 +246,23 @@ export default function TitlesApp() {
                             className={[
                                 styles.exportBtn,
                                 styles.btnSm,
-                                (loading || exportingPdf) ? styles.exportBtnDisabled : "",
+                                loading || exportingPdf ? styles.exportBtnDisabled : "",
                             ].join(" ")}
                             title="Exportar listado a PDF"
                         >
                             <span className={styles.exportIcon} aria-hidden="true">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 3v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                                    <path d="M8 9l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path
+                                        d="M8 9l4 4 4-4"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    />
                                     <path d="M4 17v3h16v-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>
                             </span>
-
                             {exportingPdf ? "PDF..." : "Exportar PDF"}
                         </button>
                     </div>
@@ -290,7 +314,17 @@ export default function TitlesApp() {
 
                         <div className={styles.field}>
                             <div className={styles.label}>Acciones</div>
-                            <button className={styles.btnGhost} type="button" onClick={() => { setQ(""); setKind(""); setTab("all"); flash("ok", "Filtros limpiados"); }}>
+                            <button
+                                className={styles.btnGhost}
+                                type="button"
+                                onClick={() => {
+                                    setQ("");
+                                    setKind("");
+                                    setTab("all");
+                                    setPage(1);
+                                    flash("ok", "Filtros limpiados");
+                                }}
+                            >
                                 Limpiar
                             </button>
                         </div>
@@ -301,12 +335,11 @@ export default function TitlesApp() {
 
                 <div className={styles.card}>
                     <div className={styles.cardTitle}>Listado</div>
-                    <TitleList
-                        items={filteredItems}
-                        onEdit={openEdit}
-                        onDelete={remove}
-                        onRequestStateChange={requestStateChange}
-                    />
+
+                    <TitleList items={pagedItems} onEdit={openEdit} onDelete={remove} onRequestStateChange={requestStateChange} />
+
+                    {/* ✅ paginación */}
+                    <Pagination page={page} totalPages={totalPages} onChange={setPage} />
                 </div>
 
                 <TitleModal

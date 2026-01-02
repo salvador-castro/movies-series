@@ -645,3 +645,98 @@
     justify-content: center;
     gap: 8px;
 }
+/* Pagination (pills, moderna y coherente con tu UI) */
+.paginationWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.paginationPills {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+/* 👇 SUPER específico: esto le gana a estilos globales de button */
+.paginationPills .pagePill {
+  all: unset; /* neutraliza cualquier global raro */
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 34px;
+  min-width: 34px;
+  padding: 0 12px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(203, 213, 225, 0.85);
+  background: rgba(248, 250, 252, 0.95);
+
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.paginationPills .pagePill:hover {
+  background: white;
+  border-color: rgba(148, 163, 184, 0.95);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.paginationPills .pagePill:active {
+  transform: translateY(0px);
+  box-shadow: none;
+}
+
+.paginationPills .pagePill:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.6);
+  outline-offset: 2px;
+}
+
+.paginationPills .pagePill[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.paginationPills .pagePillActive {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.55);
+}
+
+.pageDots {
+  padding: 0 6px;
+  opacity: 0.55;
+  font-weight: 800;
+  user-select: none;
+}
+
+@media (max-width: 520px) {
+  .paginationPills {
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .paginationPills .pagePill {
+    height: 32px;
+    min-width: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+}
