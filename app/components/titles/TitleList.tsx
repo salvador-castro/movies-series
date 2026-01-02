@@ -74,21 +74,20 @@ export default function TitleList({
                                 </div>
                             </div>
 
-                            <div style={{ minWidth: 280, display: "grid", gap: 10 }}>
-                                <div className={styles.btnRow}>
-                                    <button className={styles.btnGhost} onClick={() => onEdit(it)}>
-                                        Editar
-                                    </button>
+                            <div className={styles.btnRow}>
+                                <button className={styles.btnGhost} onClick={() => onEdit(it)}>
+                                    Editar
+                                </button>
 
-                                    <button className={styles.btnGhost} onClick={() => onRequestStateChange(it, next)}>
-                                        Pasar a {next === "para_ver" ? "Para ver" : next === "viendo" ? "Viendo" : "Vista"}
-                                    </button>
+                                <button className={styles.btnGhost} onClick={() => onRequestStateChange(it, next)}>
+                                    Pasar a {next === "para_ver" ? "Para ver" : next === "viendo" ? "Viendo" : "Vista"}
+                                </button>
 
-                                    <button className={styles.btnDanger} onClick={() => onDelete(it._id)}>
-                                        Eliminar
-                                    </button>
-                                </div>
+                                <button className={styles.btnDanger} onClick={() => onDelete(it._id)}>
+                                    Eliminar
+                                </button>
                             </div>
+
                         </div>
                     </div>
                 );

@@ -600,3 +600,17 @@
     align-items: center;
     justify-content: center;
 }
+
+.item .btnRow button {
+    padding: 6px 14px;
+    font-size: 13px;
+    line-height: 1.25;
+    border-radius: 8px;
+}
+
+@media (max-width: 640px) {
+    .item .btnRow button {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+}
