@@ -1,18 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/db";
 import { plataformas } from "@/lib/titles-constants";
 
-function getIdFromReq(req: Request, params?: { id?: string }) {
-    // 1) Params normal
-    const p = params?.id;
-    if (typeof p === "string" && p.trim()) return p.trim();
-
-    // 2) Fallback: parseo del path /api/titles/<id>
-    const pathname = new URL(req.url).pathname;
-    const last = pathname.split("/").filter(Boolean).pop();
-    return (last || "").trim();
-}
+type Ctx = { params: Promise<{ id: string }> };
 
 function normalizeDecimal(raw: any): string {
     return String(raw ?? "").trim().replace(",", ".");
@@ -26,8 +17,8 @@ function parseScore0to10(raw: any): number | null {
     return Number(n.toFixed(1));
 }
 
-export async function PATCH(req: Request, ctx: { params: { id: string } }) {
-    const id = getIdFromReq(req, ctx?.params);
+export async function PATCH(req: NextRequest, { params }: Ctx) {
+    const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
         return NextResponse.json({ error: "id inválido", received: id }, { status: 400 });
@@ -100,8 +91,8 @@ export async function PATCH(req: Request, ctx: { params: { id: string } }) {
     return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(req: Request, ctx: { params: { id: string } }) {
-    const id = getIdFromReq(req, ctx?.params);
+export async function DELETE(_req: NextRequest, { params }: Ctx) {
+    const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
         return NextResponse.json({ error: "id inválido", received: id }, { status: 400 });
