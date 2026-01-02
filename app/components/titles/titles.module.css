@@ -616,11 +616,16 @@
     .btnRow {
         margin-top: 12px;
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 8px;
     }
 
     .btnRow button {
         width: 100%;
+    }
+
+    /* Eliminar abajo ocupando todo */
+    .btnRow button:last-child {
+        grid-column: span 2;
     }
 }
