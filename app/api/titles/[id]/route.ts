@@ -3,6 +3,8 @@ import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/db";
 import { plataformas } from "@/lib/titles-constants";
 
+export const runtime = "nodejs";
+
 type Ctx = { params: Promise<{ id: string }> };
 
 function normalizeDecimal(raw: any): string {

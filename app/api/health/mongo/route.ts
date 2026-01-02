@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+export const runtime = "nodejs";
 
 export async function GET() {
     try {

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { plataformas } from "@/lib/titles-constants";
 
+export const runtime = "nodejs";
+
 type State = "para_ver" | "viendo" | "vista";
 type Kind = "movie" | "series";
 
