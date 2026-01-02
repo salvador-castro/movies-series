@@ -39,6 +39,14 @@
     gap: 10px;
     flex-wrap: wrap;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+.btnSm {
+    padding: 7px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1;
 }
 
 /* Tabs */
@@ -555,4 +563,40 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+}
+
+.exportBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 14px;
+    border-radius: 10px;
+
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.06s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.exportBtn:hover {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.18);
+}
+
+.exportBtn:active {
+    transform: translateY(1px);
+}
+
+.exportBtnDisabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.exportIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }

@@ -159,6 +159,46 @@ export default function TitlesApp() {
         }
     }
 
+    const [exportingPdf, setExportingPdf] = useState(false);
+
+    function buildPdfUrl() {
+        const sp = new URLSearchParams();
+        if (q.trim()) sp.set("q", q.trim());
+        if (kind) sp.set("kind", kind);
+        sp.set("tab", tab);
+        return `/api/titles/pdf?${sp.toString()}`;
+    }
+
+    async function handleExportPdf() {
+        if (exportingPdf) return;
+
+        try {
+            setExportingPdf(true);
+
+            const url = buildPdfUrl();
+
+            // Preflight para detectar errores del backend antes de abrir ventana
+            const res = await fetch(url, { method: "GET", cache: "no-store" });
+            if (!res.ok) {
+                const data = await res.json().catch(() => null);
+                throw new Error(data?.error || `Error ${res.status}`);
+            }
+
+            // Abrir el PDF en nueva pestaña
+            const w = window.open(url, "_blank", "noopener,noreferrer");
+            if (!w) {
+                throw new Error("El navegador bloqueó el popup. Permití popups para este sitio.");
+            }
+
+            flash("ok", "PDF generado");
+        } catch (e: any) {
+            flash("err", e?.message ?? "No se pudo exportar el PDF");
+        } finally {
+            setExportingPdf(false);
+        }
+    }
+
+
     return (
         <div className={styles.page}>
             <div className={styles.container}>
@@ -168,11 +208,38 @@ export default function TitlesApp() {
                     </div>
 
                     <div className={styles.btnRow}>
-                        <button className={styles.btnPrimary} onClick={openCreate}>
+                        <button className={[styles.btnPrimary, styles.btnSm].join(" ")} onClick={openCreate}>
                             + Agregar
                         </button>
-                        <button className={styles.btnGhost} onClick={refresh} disabled={loading}>
+
+                        <button
+                            className={[styles.btnGhost, styles.btnSm].join(" ")}
+                            onClick={refresh}
+                            disabled={loading}
+                        >
                             {loading ? "Cargando..." : "Refrescar"}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleExportPdf}
+                            disabled={loading || exportingPdf}
+                            className={[
+                                styles.exportBtn,
+                                styles.btnSm,
+                                (loading || exportingPdf) ? styles.exportBtnDisabled : "",
+                            ].join(" ")}
+                            title="Exportar listado a PDF"
+                        >
+                            <span className={styles.exportIcon} aria-hidden="true">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 3v10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    <path d="M8 9l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d="M4 17v3h16v-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                </svg>
+                            </span>
+
+                            {exportingPdf ? "PDF..." : "Exportar PDF"}
                         </button>
                     </div>
                 </div>
