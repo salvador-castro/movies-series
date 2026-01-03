@@ -36,7 +36,10 @@
   cursor: pointer;
   user-select: none;
 
-  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+  transition:
+    transform 120ms ease,
+    background 120ms ease,
+    border-color 120ms ease;
 }
 
 .pageBtn:hover:not(:disabled) {
